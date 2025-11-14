@@ -2,49 +2,56 @@
   ! NOTE: all input parameter are capital sensitive 
   ! --------------------TITLE------------------------------------- 
   ! title only for log file 
-TITLE = levee_solitary
+TITLE = 2D_beach
   ! -------------------PARALLEL INFO----------------------------- 
    !  
    !    PX,PY - processor numbers in X and Y 
    !    NOTE: make sure consistency with mpirun -np n (px*py) 
    !     
- PX = 16
- PY = 1
+ PX = 15
+ PY = 10
    ! --------------------DEPTH------------------------------------- 
    ! Depth types, DEPTH_TYPE=DATA: from depth file 
    !              DEPTH_TYPE=FLAT: idealized flat, need depth_flat 
    !              DEPTH_TYPE=SLOPE: idealized slope,  
    !                                 need slope,SLP starting point, Xslp 
    !                                 and depth_flat 
-DEPTH_TYPE=SLOPE
-DEPTH_FLAT=1.0
-SLP=0.0667
-Xslp=9.0
- 
+DEPTH_TYPE = DATA
+DEPTH_FILE = single_perturb_dy01.txt
+!DEPTH_FLAT=1.0
+!SLP=0.035
+!Xslp=67.0
    ! -------------------PRINT--------------------------------- 
    ! PRINT*, 
    ! result folder 
- RESULT_FOLDER = result2/
- 
-
+RESULT_FOLDER = reg_dy01_per_cd001/ 
    ! ------------------DIMENSION----------------------------- 
    ! global grid dimension 
- Mglob = 400
- Nglob = 3 
+ Mglob = 1050
+ Nglob = 600
 
    ! ----------------- TIME---------------------------------- 
    ! time: total computational time/ plot time / screen interval  
    ! all in seconds 
- TOTAL_TIME = 60.0 
-PLOT_INTV = 0.25
-PLOT_INTV_STATION = 0.0835
-SCREEN_INTV = 0.5
-HOTSTART_INTV = 360000000000.0
-
+ TOTAL_TIME =105000.0
+ PLOT_INTV =0.08
+ PLOT_INTV_STATION = 0.08
+ SCREEN_INTV =0.08
+ PLOT_START_TIME=0.0
+ DT_fixed=0.01
    ! -----------------GRID---------------------------------- 
    ! if use spherical grid, in decimal degrees 
- DX = 0.1 
- DY = 1.0 
+ DX = 0.1
+ DY = 0.1
+  ! --------------- INITIAL UVZ ---------------------------
+  ! INI_UVZ - initial UVZ e.g., initial deformation
+  !         must provide three (3) files 
+!INI_UVZ = T
+  ! if true, input eta u and v file names
+!ETA_FILE = job_slp_bathy_correction_8000s/eta_00120
+!U_FILE =  job_slp_bathy_correction_8000s/u_00120
+!V_FILE = job_slp_bathy_correction_8000s/v_00120
+!HotStartTime = 1200.0
    ! ----------------WAVEMAKER------------------------------ 
    !  wave maker 
    ! LEF_SOL- left boundary solitary, need AMP,DEP, LAGTIME 
@@ -60,74 +67,38 @@ HOTSTART_INTV = 360000000000.0
    !                 and then use Wei and Kirby 1999  
    !          need input WaveCompFile (including 3 columns: per,amp,pha) 
    !          NumWaveComp,PeakPeriod,DEP_WK,Xc_WK,Ywidth_WK 
-!WAVEMAKER = WK_REG
-!WAVEMAKER = LEF_SOL
-WAVEMAKER = INI_SOL
-ETA_LIMITER = F
-CrestLimit = 1.0
-TroughLimit = -1.0
-  ! wave components based on fft time series
-NumWaveComp = 1505
-PeakPeriod = 1.0
-WaveCompFile = ../input/wavemk_per_amp_pha.txt
-  ! solitary wave
-AMP = 0.1
-DEP = 1.0
-LAGTIME = 5.0
-XWAVEMAKER = 5.0
-  ! Xc, Yc and WID (degrees) are for rectangular hump with AMP
-Xc = 501.00
-Yc = 501.00
-WID = 100.0
-  ! Wei and Kirby 1999
-Time_ramp = 1.0 
-Delta_WK = 0.5    ! width parameter 0.3-0.6
-DEP_WK = 0.36
-Xc_WK = 20.0
-Yc_WK = 0.0
-Ywidth_WK = 1600.0
-  ! Wei and Kirby regular wave
-Tperiod = 3.33
-AMP_WK = 0.017
-Theta_WK = 0.0
-  ! Wei and Kirby irregular wave
-FreqPeak = 0.2
-FreqMin = 0.1
-FreqMax = 0.4
-Hmo = 1.0
-GammaTMA = 5.0
-ThetaPeak = 10.0
-Sigma_Theta = 15.0
+WAVEMAKER = WK_REG
+DEP_WK = 1.0 
+Xc_WK = 34.0 
+Yc_WK = 0.0 
+Tperiod = 2.0 
+AMP_WK = 0.06 
+Theta_WK = 0.0 
+Delta_WK = 0.5
   ! ---------------- PERIODIC BOUNDARY CONDITION --------- 
   ! South-North periodic boundary condition 
   ! 
-PERIODIC = F
+PERIODIC = T
 
   ! ---------------- SPONGE LAYER ------------------------ 
   ! need to specify widths of four boundaries and parameters if needed
   ! set width=0.0 if no sponge 
 DIFFUSION_SPONGE = F 
-FRICTION_SPONGE = F 
+FRICTION_SPONGE = T 
 DIRECT_SPONGE = T 
 Csp = 0.0 
 CDsponge = 1.0 
-Sponge_west_width =  2.0 
+Sponge_west_width =  25.0 
 Sponge_east_width =  0.0 
 Sponge_south_width = 0.0 
 Sponge_north_width = 0.0 
-R_sponge = 0.85
-A_sponge = 5.0
+
   ! ----------------PHYSICS------------------------------ 
   ! parameters to control type of equations 
   ! dispersion: all dispersive terms 
   ! gamma1=1.0,gamma2=1.0: defalt: Fully nonlinear equations 
-DISPERSION = T
-Gamma1 = 1.0
-Gamma2 = 1.0
-Gamma3 = 1.0
-Beta_ref=-0.531
   !----------------Friction----------------------------- 
-Cd = 0.01 
+Cd = 0.01
 
   ! ----------------NUMERICS---------------------------- 
   ! time scheme: runge_kutta for all types of equations 
@@ -137,26 +108,33 @@ Cd = 0.01
   ! construction: HLLC 
   ! cfl condition: CFL 
   ! froude number cap: FroudeCap 
-HIGH_ORDER = THIRD 
+ HIGH_ORDER = FOURTH 
   ! CFL 
-CFL = 0.1 
+CFL = 0.2
   ! Froude Number Cap (to avoid jumping drop, set 1.5) 
-FroudeCap =10.0 
+FroudeCap = 1.5 
 
   ! --------------WET-DRY------------------------------- 
   ! MinDepth for wetting-drying 
-MinDepth=0.001 
-MinDepthFrc = 0.001
+MinDepth=0.01 
+MinDepthFrc=0.01
 
   ! -------------- BREAKING ----------------------------
-VISCOSITY_BREAKING = T 
+VISCOSITY_BREAKING = T
+!ROLLER_EFFECT = T 
 Cbrk1 = 0.45 
 Cbrk2 = 0.35 
   ! ----------------- WAVE AVERAGE ------------------------ 
   ! if use smagorinsky mixing, have to set -DMIXING in Makefile 
   ! and set averaging time interval, T_INTV_mean, default: 20s 
-T_INTV_mean = 25.0 
-STEADY_TIME = 100.0 
+T_INTV_mean = 2.0 
+STEADY_TIME = 0.0 
+
+
+! ----------------- Bathymetry Correction ------------------------ 
+BATHY_CORRECTION = F
+SmoothBelowDepth = -1.0
+SlopeCap = 1.0
 
   ! -----------------OUTPUT----------------------------- 
   ! stations  
@@ -165,34 +143,39 @@ NumberStations = 0
 STATIONS_FILE = gauges.txt 
   ! output variables, T=.TRUE, F = .FALSE. 
 DEPTH_OUT = T 
-ETA = T 
-MASK = T 
 U = T 
 V = T 
 ETA = T 
-!Umean = T 
-!Vmean = T 
-!ETAmean = T 
-!WaveHeight = T
+Umean = T 
+Vmean = T 
+ETAmean = T 
+Bedfxmean=T
+Bedfymean=T
+!Umax=T
+!VORmax = T
+WaveHeight = T
 AGE=T
-OUT_NU=T
-
+!OUT_NU=T
+!MASK = T 
+!MASK9 = F 
 !UNDERTOW = T
 !ROLLER = T
-  ! ------  Sediment
+
+ ! ------  Sediment------------------------ 
+Sed_Scheme = TVD
+Hard_bottom = F
 Bed_Change = T
+Avalanche = T
 BedLoad = T
-D50 = 0.0005
-Sdensity = 2.68
+Morph_factor = 1
+Morph_step= 1
+D50 = 0.0002
+Sdensity = 2.65
 n_porosity = 0.47
-WS = 0.0125
+WS = 0.0184
 Shields_cr = 0.055
 Shields_cr_bedload = 0.047
-Tan_phi = 0.7
+Tan_phi = 0.3
 Kappa1 = 0.3333
 Kappa2 = 1.0
-MinDepthPickup = 0.001 
-Morph_factor = 1
-
-
-
+MinDepthPickup = 0.1
